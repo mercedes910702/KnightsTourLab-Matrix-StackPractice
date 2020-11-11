@@ -1,0 +1,344 @@
+import java.awt.*; 
+import javax.swing.*;
+import java.io.*;
+import java.util.*;
+import java.util.List;
+/*
+ * Mercedes Moore
+ * APCSA 
+ * Knights Tour Lab
+ */
+
+
+/*
+ * This program simulates a chess related problem developed by a famous Mathematician 
+ Leonard Euler. The basis of the problem revolves around the path of a knight chess piece.
+  Euler questioned whether or not it was possible for a knight to visit all the squares on 
+  the chessboard without visiting any square more than once. This problem simulates the 
+  movements of a knights piece on a chessboard in order to answer this. The major classes
+  in this program are the Chessboard class, which simulates a real life chessboard, and 
+  the TourStack class, which keeps track of the squares the knight has already visited. 
+  This program also includes a graphic component that visualizes the track of the chess
+   piece using an 8x8 grid and 'k's. 
+ */
+/*******************************************************************************************/
+
+
+/*
+ * The Chessboard class simulates a real life chessboard in order to help simulate the knight's movements. Each spot on the chessboard holds a boolean value, indicating whether or not it has visited.  This class includes modifier and accessor methods. 
+ */
+
+class Chessboard
+{
+	//Instance Variables
+	private boolean[][] chessMatrix; 
+	
+	/*
+	 * Constructor
+	 * pre:N/A
+	 * post: A chessboard object is created. All squares of the boards are 
+	 * false and have never been visited. 
+	 */
+	public Chessboard()
+	{
+		chessMatrix = new boolean[5][5]; 
+		for (int rowPos = 0; rowPos < chessMatrix.length; rowPos++)
+		{
+			for (int colPos = 0; colPos < chessMatrix[0].length; colPos++)
+			{
+				chessMatrix[rowPos][colPos] = false; 
+           
+			}
+		}
+      
+	}
+	
+	/*
+	 * Modifier Method
+	 * pre: rPos and cPos are integer values and on the chessboard
+	 * post: The state of the square (denoted by rPos and cPos) has been 
+	 * changed.
+	 */
+	public void changeSquare(int rPos, int cPos)
+	{
+		boolean temp = chessMatrix[rPos][cPos];
+		chessMatrix[rPos][cPos] = !temp; 
+	}
+	
+	/*
+	 * Accessor Method
+	 * pre: rowPos and colPos are integer values and on the chessboard
+	 * post: The status of the square indicated is returned
+	 */
+	public boolean getSquare(int rowPos, int colPos)
+	{
+		return chessMatrix[rowPos][colPos]; 
+	}
+	
+	/*
+	 * Accessor Method
+	 * pre: a Chessboard object exists
+	 * post: Returns true if the all the chessboard squares have been 
+	 * visited and false otherwise. 
+	 */
+	public boolean allVisited()
+	{
+		boolean result = true;
+		
+		for (int rowPos = 0; rowPos< chessMatrix.length; rowPos++)
+		{
+			for (int colPos = 0; colPos <chessMatrix[0].length; colPos++)
+			{
+				if (chessMatrix[rowPos][colPos] == false)
+				{
+					return false;
+				}
+			}
+		}
+		return result; 
+	}
+	
+   
+   /*
+    * pre: g is a valid Graphics object
+    * post: Displays a grid and draws a "K" in the center of a square that 
+    * has been visited.
+    */
+	public void display(Graphics g)
+	{
+    g.drawString("It works", 200,200);  
+		for (int rowPos = 0; rowPos < chessMatrix.length; rowPos++) 
+	      {
+				for (int colPos = 0; colPos <chessMatrix[0].length; colPos++) 
+	         {
+			      g.drawRect(rowPos*20, colPos*20, 20, 20);  
+					if(chessMatrix[rowPos][colPos] == true) 
+					{
+                 		
+						g.drawString("k",rowPos*20+10, colPos*20+10);   
+					}
+				}
+		   }
+	}
+   
+	/*
+	 * Accessor Method
+	 * pre: A chessboard object exists
+	 * post: Returns the size of the chessMatrix object
+	 */
+   public int size()
+   {
+      return chessMatrix.length;
+   }
+}
+
+
+/*******************************************************************************************/
+
+/*
+ * The TourStack class is a stack data structure that keeps track of the squares that the knight has already visited. There are various accessor and modifier methods within this class. 
+ */
+class TourStack
+{
+	//Instance Variables
+	private ArrayList<String> squaresVisited;
+	
+	//Constructor
+	/*
+	 * pre: N/A
+	 * post: A TourStack object is created
+	 */
+	public TourStack()
+	{
+		squaresVisited = new ArrayList<String>();
+	}
+   
+	//Modifier Method
+	/*
+	 * pre: newCoordinates is a valid String object
+	 * post: The newCoordinates provided are added to the beginning of the 
+	 * TourStack object 
+	 */
+	public void push(String newCoordinates)
+	{
+		squaresVisited.add(0, newCoordinates);
+	}
+   //Accessor Method
+	/*
+	 * pre: A valid TourStack object exists
+	 * post: The size of the tourStack object is returned
+	 */
+   public int size()
+   {
+      return squaresVisited.size();
+   }
+   
+   //Modifier Method
+   /*
+    * pre: A valid tourStack object exists
+    * post: The first object at the start of the tourStack is removed. 
+    */
+	public void pop()
+	{
+     
+       if (squaresVisited.size()>0)
+         squaresVisited.remove(0);
+	}
+	
+	//Function Method
+	/*
+	 * pre: A valid tourStack Object exists
+	 * post: The coordinates of the TourStack are printed to the console. 
+	 */
+	public void display() 
+	{
+      System.out.println("display called");
+      System.out.println("size: " + squaresVisited.size());
+		for (int pos = squaresVisited.size()-1; pos >=0; pos--)  //POS SHOULD GO TO ZERO
+		{
+			System.out.println(squaresVisited.get(pos));
+		}
+	}
+}
+	
+/*******************************************************************************************/   
+ 
+ 
+/*
+ * The graphics component class is where the graphics for this simulation occur. The graphic component class requires a chessboard object and a tourstack object. With this, the user of this program can visualize the chessboard as described in the earlier chessboard class. The GraphicComponent class is then passed in later in the driver program. 
+ */
+class GraphicsComponent extends JComponent
+ {
+	// Instance Variables
+	
+     
+		private Chessboard myBoard;
+      
+		private TourStack myStack;
+      
+    
+ 
+		//Constructor
+		/*
+		 * pre: newChess is  valid Chessboard object and newStack is a 
+		 * valid tourStack object. 
+		 * post: A GraphicsComponent object is created, the knightsTour 
+		 * method is ran and the coordinates of the tourStack object are 
+		 * printed
+		 */
+		public GraphicsComponent (Chessboard newChess, TourStack newStack)
+		{
+			myBoard = newChess;
+			myStack = newStack;
+         knightsTour(0,0,myBoard,myStack);    //NEVER CALLED THE KNIGHT'S TOUR METHOD
+         myStack.display();    //DID NOT CALL THIS TO DISPLAY THE MOVES
+         System.out.println("program finished");
+		}
+		
+		//Recurisve Method
+		/*
+		 * pre: row and col are valid integers, myBoard is a valid 
+		 * Chessboard object, and myStack is a valid TourStack object. 
+		 * post: The current chessboard is displayed. The method tries to 
+		 * recursively visit all squares around the chessboard object. 
+		 */
+      public void knightsTour(int row, int col, Chessboard myBoard, TourStack myStack) //NEED TO ADD THE TOURSTACK TO THE PARAMETER LIST
+   	{
+         repaint();
+   		
+   		if (myBoard.allVisited())
+   		{
+   			return;  //QUIT YOU SOLVED THE PROBLEM
+   		}
+   
+   		else if (row >= myBoard.size() || row < 0 || col >= myBoard.size() || col < 0 || myBoard.getSquare(row, col) == true)
+   		{
+   			return; 
+   		}
+   		else
+   		{
+           
+         myBoard.changeSquare(row, col);
+         String newMove = "(" + row + "," + col+ ")"; 
+         myStack.push(newMove);
+         
+         
+   		
+        
+         //left up 
+         knightsTour(row-2,col+1,myBoard, myStack);
+         //left down
+         knightsTour(row-2, col-1, myBoard, myStack);   
+         //right up 
+         knightsTour(row+2, col+1, myBoard, myStack);
+         //right down
+         knightsTour(row+2, col-1, myBoard, myStack);
+         //up right
+         knightsTour(row+1, col+2,myBoard,myStack);
+         //up left
+         knightsTour(row-1, col+2, myBoard, myStack);
+         //down right
+         knightsTour(row+1, col-2, myBoard,myStack);
+         //down left
+         knightsTour(row-1, col-2, myBoard, myStack);   /
+   		}
+        
+   		if (myBoard.allVisited()== false)
+   		{
+            //System.out.println("Stack size " + myStack.size());
+   			myBoard.changeSquare(row,col);
+   			myStack.pop(); 
+   		}
+   	}
+      
+      //Function Method
+      /*
+       * pre: g is a valid Graphics object
+       * post: The component described earlier is displayed. 
+       */
+      public void paintComponent(Graphics g)
+      {
+  
+         myBoard.display(g);
+       
+
+      }
+ 
+   
+ 
+ 
+ }
+   
+   
+   
+/*******************************************************************************************/	
+
+//Driver Program
+public class KnightsTour {
+	
+	
+	public static void main(String[] args) {
+		//Graphics Settings
+		JFrame frame = new JFrame();
+		frame.setSize(400, 400);   
+		frame.setTitle("Knights Tour");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		//Test objects 
+		Chessboard testChessboard = new Chessboard(); 
+		TourStack testStack = new TourStack();
+      
+      GraphicsComponent myGraphics = new GraphicsComponent(testChessboard, testStack);
+      frame.add(myGraphics);
+      
+      frame.setVisible(true);
+		
+		
+		
+		
+	
+		
+		
+	}
+
+}
